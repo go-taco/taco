@@ -1,8 +1,11 @@
 package server
 
 import (
+	"context"
 	"fmt"
 
+	"github.com/gofiber/fiber/v2"
+	"github.com/yagobatista/taco-go-web-framework/src/middlewares"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -56,4 +59,34 @@ func postgresDialector(config DatabaseConfig) gorm.Dialector {
 		config.Port,
 	)
 	return postgres.Open(dsn)
+}
+
+func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(ctx context.Context) (Result, error)) (Result, error) {
+	var result Result
+
+	err := server.dbConnection.conn.Transaction(func(tx *gorm.DB) (err error) {
+		newCtx := SetToCtx(ctx, tx)
+		result, err = f(newCtx)
+		return err
+	})
+
+	return result, err
+}
+
+func ConnectionMiddleware(server *Server) middlewares.Middleware {
+	return func(c *fiber.Ctx) error {
+		ctx := SetToCtx(c.UserContext(), server.dbConnection.conn)
+
+		c.SetUserContext(ctx)
+
+		return c.Next()
+	}
+}
+
+func GetFromCtx(ctx context.Context) *gorm.DB {
+	return ctx.Value("conn").(*gorm.DB)
+}
+
+func SetToCtx(ctx context.Context, conn *gorm.DB) context.Context {
+	return context.WithValue(ctx, "conn", conn)
 }
