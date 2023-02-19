@@ -31,7 +31,7 @@ func (this *DbHealthCheckHandler) Routes(d route.Dispatcher) {
 }
 
 func (this *DbHealthCheckHandler) Ping(ctx context.Context, urlParams struct{}, payload struct{}) (string, error) {
-	conn := server.GetFromCtx(ctx)
+	conn := server.GetConnectionFromCtx(ctx)
 
 	db, err := conn.DB()
 	if err != nil {

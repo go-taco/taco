@@ -70,7 +70,10 @@ func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(
 	var result Result
 
 	err := server.dbConnection.conn.Transaction(func(tx *gorm.DB) (err error) {
-		newCtx := SetToCtx(ctx, tx)
+		newCtx := SetConnectionToCtx(ctx,
+			tx.WithContext(ctx),
+		)
+
 		result, err = f(newCtx)
 		return err
 	})
@@ -80,7 +83,7 @@ func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(
 
 func connectionMiddleware(server *Server) middlewares.Middleware {
 	return func(c *fiber.Ctx) error {
-		ctx := SetToCtx(c.UserContext(), server.dbConnection.conn)
+		ctx := SetConnectionToCtx(c.UserContext(), server.dbConnection.conn)
 
 		c.SetUserContext(ctx)
 
@@ -88,10 +91,10 @@ func connectionMiddleware(server *Server) middlewares.Middleware {
 	}
 }
 
-func GetFromCtx(ctx context.Context) *gorm.DB {
+func GetConnectionFromCtx(ctx context.Context) *gorm.DB {
 	return ctx.Value("conn").(*gorm.DB)
 }
 
-func SetToCtx(ctx context.Context, conn *gorm.DB) context.Context {
+func SetConnectionToCtx(ctx context.Context, conn *gorm.DB) context.Context {
 	return context.WithValue(ctx, "conn", conn)
 }
