@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/gofiber/fiber/v2 v2.42.0
+	github.com/gofiber/template v1.7.5
 	github.com/invopop/jsonschema v0.7.0
 	gorm.io/driver/postgres v1.4.8
 	gorm.io/gorm v1.24.5

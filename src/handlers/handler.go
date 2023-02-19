@@ -75,7 +75,7 @@ func (this *Handler[UrlParams, Body, Response]) Docs(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Render("index", fiber.Map{
+	return c.Render("templates/docs-detail", fiber.Map{
 		"Payload":  string(expectedPayload),
 		"Response": string(expectedResponse),
 		"Title":    fmt.Sprintf("%s - %s", this.Method, this.name),

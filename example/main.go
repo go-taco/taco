@@ -13,6 +13,7 @@ func main() {
 		Handlers: []server.Handler{
 			handlers.NewDbHealthCheckHandler(routes.PUBLIC),
 		},
+		Docs: true,
 		Routes: server.Router{
 			routes.PUBLIC: nil,
 			routes.INTERNAL: {

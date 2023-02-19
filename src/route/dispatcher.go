@@ -34,8 +34,11 @@ func (this *Dispatcher) GetRouter(routeKey Route) fiber.Router {
 
 func (this *Dispatcher) SetMiddleware(routeKey Route, middlewares []middlewares.Middleware) {
 	var newMiddlewares []any
+
 	for _, middleware := range middlewares {
-		newMiddlewares = append(newMiddlewares, middleware)
+		newMiddlewares = append(newMiddlewares, func(c *fiber.Ctx) error {
+			return middleware(c)
+		})
 	}
 
 	this.routes[routeKey] = this.GetRouter(routeKey).Use(newMiddlewares...)

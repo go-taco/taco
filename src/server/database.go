@@ -17,6 +17,7 @@ const (
 )
 
 type DatabaseConfig struct {
+	Disabled bool
 	Server   DatabaseServer
 	Host     string
 	Port     int
@@ -34,6 +35,10 @@ var availableServer = map[DatabaseServer]func(config DatabaseConfig) gorm.Dialec
 }
 
 func NewDatabaseConnection(config DatabaseConfig) *DatabaseConnection {
+	if config.Disabled {
+		return &DatabaseConnection{}
+	}
+
 	dialectorFunc, ok := availableServer[config.Server]
 	if !ok {
 		panic("missing server type")
@@ -73,7 +78,7 @@ func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(
 	return result, err
 }
 
-func ConnectionMiddleware(server *Server) middlewares.Middleware {
+func connectionMiddleware(server *Server) middlewares.Middleware {
 	return func(c *fiber.Ctx) error {
 		ctx := SetToCtx(c.UserContext(), server.dbConnection.conn)
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"strings"
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
@@ -51,7 +50,7 @@ type Server struct {
 func NewServer(config *ServerConfig) *Server {
 	conn := NewDatabaseConnection(config.DatabaseConnections)
 
-	app := fiber.New(fiber.Config{})
+	app := fiber.New(getFiberConfig(config))
 
 	server := &Server{
 		dbConnection: conn,
@@ -92,43 +91,22 @@ func (this *Server) loadRoutes(serverConfig ServerConfig) {
 	}
 }
 
-func (this *Server) buildDocs(serverConfig ServerConfig) {
-	if !serverConfig.Docs {
-		return
-	}
-
-	documentedRoutes := make(map[string]string)
-
-	for _, route := range this.app.GetRoutes() {
-		if !strings.Contains(route.Path, "/docs") {
-			continue
-		}
-
-		name, found := documentedRoutes[route.Path]
-		if found && name != "" {
-			continue
-		}
-
-		documentedRoutes[route.Path] = route.Name
-	}
-
-	this.app.Use("docs", func(c *fiber.Ctx) error {
-		return c.Render("docs", fiber.Map{
-			"Routes": documentedRoutes,
-		})
-	})
-}
-
 func (this *Server) setMainRouter(mainMiddlewares []middlewares.Middleware) fiber.Router {
 	mainRouter := this.app.Group("")
 
-	mainRouter.Use(recover.New())
+	mainRouter.Use(
+		recover.New(recover.Config{
+			EnableStackTrace: true,
+		}),
+	)
+
+	mainMiddlewares = append(mainMiddlewares, connectionMiddleware(this))
 
 	for _, middleware := range mainMiddlewares {
-		mainRouter = mainRouter.Use(middleware)
+		mainRouter.Use(func(c *fiber.Ctx) error {
+			return middleware(c)
+		})
 	}
-
-	mainRouter.Use(ConnectionMiddleware(this))
 
 	return mainRouter
 }
