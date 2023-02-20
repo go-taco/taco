@@ -23,6 +23,7 @@ func (this *DbHealthCheckHandler) Routes(d route.Dispatcher) {
 	group := d.GetRouter(this.route).Group("health")
 
 	SetGet(
+		this.BaseHandler,
 		group,
 		"/ping",
 		"health check route",

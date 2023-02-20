@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -18,11 +17,15 @@ type Processor[UrlParams any, Body any, Response any] func(ctx context.Context, 
 type Handler[UrlParams any, Body any, Response any] struct {
 	BaseHandler
 
-	Url       string
-	Method    string
+	Url    string
+	DocUrl string
+
+	Method string
+	router fiber.Router
+
 	processor Processor[UrlParams, Body, Response]
-	router    fiber.Router
-	name      string
+
+	name string
 }
 
 func (this *Handler[UrlParams, Body, Response]) Mount() {
@@ -30,11 +33,17 @@ func (this *Handler[UrlParams, Body, Response]) Mount() {
 		this.router.Post(this.Url, this.Process)
 	}
 
+	if this.Method == http.MethodPatch {
+		this.router.Patch(this.Url, this.Process)
+	}
+
 	if this.Method == http.MethodGet {
 		this.router.Get(this.Url, this.Process)
 	}
 
-	this.router.Get(this.Url+"/docs", this.Docs).
+	docsUrl := fmt.Sprintf("%s%s/docs", this.Url, this.DocUrl)
+
+	this.router.Get(docsUrl, this.Docs).
 		Name(fmt.Sprintf("%s - %s", this.Method, this.name))
 }
 
@@ -65,21 +74,23 @@ func (this *Handler[UrlParams, Body, Response]) Docs(c *fiber.Ctx) error {
 	var payload Body
 	var response Response
 
-	expectedPayload, err := json.Marshal(jsonschema.Reflect(&payload))
+	expectedPayload, err := jsonschema.Reflect(&payload).MarshalJSON()
 	if err != nil {
 		return err
 	}
 
-	expectedResponse, err := json.Marshal(jsonschema.Reflect(&response))
+	expectedResponse, err := jsonschema.Reflect(&response).MarshalJSON()
 	if err != nil {
 		return err
 	}
+
+	docsUrl := fmt.Sprintf("%s/docs", this.DocUrl)
 
 	return c.Render("templates/docs-detail", fiber.Map{
 		"Payload":  string(expectedPayload),
 		"Response": string(expectedResponse),
 		"Title":    fmt.Sprintf("%s - %s", this.Method, this.name),
-		"Route":    strings.Replace(c.Route().Path, "/docs", "", 1),
+		"Route":    strings.Replace(c.Route().Path, docsUrl, "", 1),
 	})
 }
 
@@ -113,7 +124,7 @@ func (this *Handler[UrlParams, Body, Response]) process(requestCtx context.Conte
 
 	return server.RunWithTransaction(
 		requestCtx,
-		this.server,
+		this.GetServer(),
 		func(ctx context.Context) (Response, error) {
 			return this.processor(ctx, urlParams, input)
 		},
