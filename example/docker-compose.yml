@@ -1,0 +1,11 @@
+version: '3.5'
+
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: "example"
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"

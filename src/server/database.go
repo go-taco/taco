@@ -16,6 +16,10 @@ const (
 	POSTGRES DatabaseServer = "postgres"
 )
 
+var availableServer = map[DatabaseServer]func(config DatabaseConfig) gorm.Dialector{
+	POSTGRES: postgresDialector,
+}
+
 type DatabaseConfig struct {
 	Disabled bool
 	Server   DatabaseServer
@@ -28,10 +32,6 @@ type DatabaseConfig struct {
 
 type DatabaseConnection struct {
 	conn *gorm.DB
-}
-
-var availableServer = map[DatabaseServer]func(config DatabaseConfig) gorm.Dialector{
-	POSTGRES: postgresDialector,
 }
 
 func NewDatabaseConnection(config DatabaseConfig) *DatabaseConnection {
@@ -52,6 +52,10 @@ func NewDatabaseConnection(config DatabaseConfig) *DatabaseConnection {
 	return &DatabaseConnection{
 		conn: db,
 	}
+}
+
+func (this *DatabaseConnection) GetConnection() *gorm.DB {
+	return this.conn
 }
 
 func postgresDialector(config DatabaseConfig) gorm.Dialector {

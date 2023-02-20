@@ -14,6 +14,14 @@ func main() {
 			handlers.NewDbHealthCheckHandler(routes.PUBLIC),
 		},
 		Docs: true,
+		DatabaseConnections: server.DatabaseConfig{
+			Server:   server.POSTGRES,
+			Host:     "localhost",
+			Name:     "example",
+			User:     "postgres",
+			Password: "postgres",
+			Port:     5432,
+		},
 		Routes: server.Router{
 			routes.PUBLIC: nil,
 			routes.INTERNAL: {
