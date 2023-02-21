@@ -14,7 +14,7 @@ import (
 
 type Processor[UrlParams any, Body any, Response any] func(ctx context.Context, UrlParams UrlParams, input Body) (Response, error)
 
-type Handler[UrlParams any, Body any, Response any] struct {
+type Handler[UrlParams any, Payload any, Response any] struct {
 	BaseHandler
 
 	Url    string
@@ -23,12 +23,11 @@ type Handler[UrlParams any, Body any, Response any] struct {
 	Method string
 	router fiber.Router
 
-	processor Processor[UrlParams, Body, Response]
-
-	name string
+	processor Processor[UrlParams, Payload, Response]
+	name      string
 }
 
-func (this *Handler[UrlParams, Body, Response]) Mount() {
+func (this *Handler[UrlParams, Payload, Response]) Mount() {
 	if this.Method == http.MethodPost {
 		this.router.Post(this.Url, this.Process)
 	}
@@ -42,12 +41,12 @@ func (this *Handler[UrlParams, Body, Response]) Mount() {
 	}
 
 	docsUrl := fmt.Sprintf("%s%s/docs", this.Url, this.DocUrl)
+	docRouteName := fmt.Sprintf("%s - %s", this.Method, this.name)
 
-	this.router.Get(docsUrl, this.Docs).
-		Name(fmt.Sprintf("%s - %s", this.Method, this.name))
+	this.router.Get(docsUrl, this.Docs).Name(docRouteName)
 }
 
-func (this *Handler[UrlParams, Body, Response]) Parse(c *fiber.Ctx) (urlParams UrlParams, body Body, err error) {
+func (this *Handler[UrlParams, Payload, Response]) Parse(c *fiber.Ctx) (urlParams UrlParams, body Payload, err error) {
 	err = c.ParamsParser(&urlParams)
 	if err != nil {
 		return
@@ -70,8 +69,8 @@ func (this *Handler[UrlParams, Body, Response]) Parse(c *fiber.Ctx) (urlParams U
 	return
 }
 
-func (this *Handler[UrlParams, Body, Response]) Docs(c *fiber.Ctx) error {
-	var payload Body
+func (this *Handler[UrlParams, Payload, Response]) Docs(c *fiber.Ctx) error {
+	var payload Payload
 	var response Response
 
 	expectedPayload, err := jsonschema.Reflect(&payload).MarshalJSON()
@@ -94,7 +93,7 @@ func (this *Handler[UrlParams, Body, Response]) Docs(c *fiber.Ctx) error {
 	})
 }
 
-func (this *Handler[UrlParams, Body, Response]) Process(c *fiber.Ctx) error {
+func (this *Handler[UrlParams, Payload, Response]) Process(c *fiber.Ctx) error {
 	urlParams, body, err := this.Parse(c)
 	if err != nil {
 		return c.Status(http.StatusBadRequest).JSON(err)
@@ -114,19 +113,18 @@ func (this *Handler[UrlParams, Body, Response]) getStatus() int {
 	}
 
 	return http.StatusOK
-
 }
 
-func (this *Handler[UrlParams, Body, Response]) process(requestCtx context.Context, urlParams UrlParams, input Body) (Response, error) {
+func (this *Handler[UrlParams, Payload, Response]) process(requestCtx context.Context, urlParams UrlParams, payload Payload) (Response, error) {
 	if this.Method == http.MethodGet {
-		return this.processor(requestCtx, urlParams, input)
+		return this.processor(requestCtx, urlParams, payload)
 	}
 
 	return server.RunWithTransaction(
 		requestCtx,
 		this.GetServer(),
 		func(ctx context.Context) (Response, error) {
-			return this.processor(ctx, urlParams, input)
+			return this.processor(ctx, urlParams, payload)
 		},
 	)
 }
