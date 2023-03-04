@@ -21,29 +21,29 @@ type Handler[UrlParams any, Payload any, Response any] struct {
 	DocUrl string
 
 	Method string
-	router fiber.Router
+	Router fiber.Router
 
-	processor Processor[UrlParams, Payload, Response]
-	name      string
+	Processor Processor[UrlParams, Payload, Response]
+	Name      string
 }
 
 func (this *Handler[UrlParams, Payload, Response]) Mount() {
 	if this.Method == http.MethodPost {
-		this.router.Post(this.Url, this.Process)
+		this.Router.Post(this.Url, this.Process)
 	}
 
 	if this.Method == http.MethodPatch {
-		this.router.Patch(this.Url, this.Process)
+		this.Router.Patch(this.Url, this.Process)
 	}
 
 	if this.Method == http.MethodGet {
-		this.router.Get(this.Url, this.Process)
+		this.Router.Get(this.Url, this.Process)
 	}
 
 	docsUrl := fmt.Sprintf("%s%s/docs", this.Url, this.DocUrl)
-	docRouteName := fmt.Sprintf("%s - %s", this.Method, this.name)
+	docRouteName := fmt.Sprintf("%s - %s", this.Method, this.Name)
 
-	this.router.Get(docsUrl, this.Docs).Name(docRouteName)
+	this.Router.Get(docsUrl, this.Docs).Name(docRouteName)
 }
 
 func (this *Handler[UrlParams, Payload, Response]) Parse(c *fiber.Ctx) (urlParams UrlParams, body Payload, err error) {
@@ -88,7 +88,7 @@ func (this *Handler[UrlParams, Payload, Response]) Docs(c *fiber.Ctx) error {
 	return c.Render("templates/docs-detail", fiber.Map{
 		"Payload":  string(expectedPayload),
 		"Response": string(expectedResponse),
-		"Title":    fmt.Sprintf("%s - %s", this.Method, this.name),
+		"Title":    fmt.Sprintf("%s - %s", this.Method, this.Name),
 		"Route":    strings.Replace(c.Route().Path, docsUrl, "", 1),
 	})
 }
@@ -107,7 +107,7 @@ func (this *Handler[UrlParams, Payload, Response]) Process(c *fiber.Ctx) error {
 	return c.Status(this.getStatus()).JSON(response)
 }
 
-func (this *Handler[UrlParams, Body, Response]) getStatus() int {
+func (this *Handler[UrlParams, Payload, Response]) getStatus() int {
 	if this.Method == http.MethodPost {
 		return http.StatusCreated
 	}
@@ -117,14 +117,14 @@ func (this *Handler[UrlParams, Body, Response]) getStatus() int {
 
 func (this *Handler[UrlParams, Payload, Response]) process(requestCtx context.Context, urlParams UrlParams, payload Payload) (Response, error) {
 	if this.Method == http.MethodGet {
-		return this.processor(requestCtx, urlParams, payload)
+		return this.Processor(requestCtx, urlParams, payload)
 	}
 
 	return server.RunWithTransaction(
 		requestCtx,
 		this.GetServer(),
 		func(ctx context.Context) (Response, error) {
-			return this.processor(ctx, urlParams, payload)
+			return this.Processor(ctx, urlParams, payload)
 		},
 	)
 }
