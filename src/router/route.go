@@ -22,12 +22,12 @@ func SetRouteWithDocs[UrlParams any, Payload any, Response any](base handlers.Ba
 	handler.Mount()
 }
 
-func SetRouteWithSerializer[UrlParams any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, docsUrl, method string, name string, serializer serializers.Serializer[UrlParams, Payload, Model, Response]) {
+func SetRouteWithSerializer[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url, docsUrl, method, name string, serializer serializers.Serializer[Payload, Model, Response]) {
 	SetRouteWithDocs(
 		base,
 		router,
 		url,
-		"",
+		docsUrl,
 		method,
 		name,
 		serializers.SerializerToProcessor(serializer),

@@ -9,7 +9,7 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/serializers"
 )
 
-func NewCreateModelSerializerHandler[UrlParams any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[UrlParams, Payload, Model, Response]) {
+func NewCreateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
 	SetRouteWithSerializer(
 		base,
 		router,
@@ -21,7 +21,7 @@ func NewCreateModelSerializerHandler[UrlParams any, Payload any, Model any, Resp
 	)
 }
 
-func NewUpdateModelSerializerHandler[UrlParams any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[UrlParams, Payload, Model, Response]) {
+func NewUpdateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithSerializer(
 		base,
@@ -34,7 +34,7 @@ func NewUpdateModelSerializerHandler[UrlParams any, Payload any, Model any, Resp
 	)
 }
 
-func NewGetModelSerializerHandler[UrlParams any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[UrlParams, Payload, Model, Response]) {
+func NewGetModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithSerializer(
 		base,
@@ -47,7 +47,7 @@ func NewGetModelSerializerHandler[UrlParams any, Payload any, Model any, Respons
 	)
 }
 
-func NewListModelSerializerHandler[UrlParams any, Filters any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[UrlParams, Filters, Model, Response]) {
+func NewListModelSerializerHandler[Filters any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Filters, Model, Response]) {
 	SetRouteWithSerializer(
 		base,
 		router,
