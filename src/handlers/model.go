@@ -58,15 +58,3 @@ func GetModel[Model any](ctx context.Context, urlParams ModelUrlParams, payload 
 
 	return instance, err
 }
-
-func ListModel[Filters any, Model any](ctx context.Context, urlParams struct{}, filters Filters) (results []Model, err error) {
-	var model Model
-
-	err = server.GetConnectionFromCtx(ctx).
-		Model(model).
-		Where(filters).
-		Find(&results).
-		Error
-
-	return results, err
-}
