@@ -9,5 +9,6 @@ type Book struct {
 }
 
 type BookFilter struct {
-	Title string `query:"title"`
+	IdIN  *[]uint `query:"id__in"`
+	Title *string `query:"title"`
 }
