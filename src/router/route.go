@@ -5,7 +5,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/yagobatista/taco-go-web-framework/src/handlers"
-	"github.com/yagobatista/taco-go-web-framework/src/serializers"
 )
 
 func SetRouteWithDocs[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, docsUrl, method string, name string, processor handlers.Processor[UrlParams, Payload, Response]) {
@@ -20,18 +19,6 @@ func SetRouteWithDocs[UrlParams any, Payload any, Response any](base handlers.Ba
 
 	handler.SetServer(base.GetServer())
 	handler.Mount()
-}
-
-func SetRouteWithSerializer[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url, docsUrl, method, name string, serializer serializers.Serializer[Payload, Model, Response]) {
-	SetRouteWithDocs(
-		base,
-		router,
-		url,
-		docsUrl,
-		method,
-		name,
-		serializers.SerializerToProcessor(serializer),
-	)
 }
 
 func SetRoute[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, method string, name string, processor handlers.Processor[UrlParams, Payload, Response]) {

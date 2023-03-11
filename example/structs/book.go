@@ -17,10 +17,10 @@ type BookCreatePayload struct {
 }
 
 type BookResponse struct {
-	ID        uint `gorm:"primarykey"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	Title     string `json:"title"`
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Title     string    `json:"title"`
 }
 
 type BookFilter struct {

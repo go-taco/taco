@@ -15,6 +15,7 @@ type BookHandler struct {
 
 func (this *BookHandler) Routes(d route.Dispatcher) {
 	group := d.GetRouter(routes.INTERNAL).Group("book")
+	serializerModelGroup := d.GetRouter(routes.INTERNAL).Group("book-serializer-model")
 	serializerGroup := d.GetRouter(routes.INTERNAL).Group("book-serializer")
 
 	router.NewModelHandler[structs.BookFilter, structs.Book](
@@ -28,21 +29,35 @@ func (this *BookHandler) Routes(d route.Dispatcher) {
 		this.BaseHandler,
 		serializerGroup,
 		"",
-		"Book serializer model",
+		"Book serializer create",
 		books.CreateBookSerializer{},
 	)
 	router.NewUpdateModelSerializerHandler[structs.BookCreatePayload, structs.Book, structs.BookResponse](
 		this.BaseHandler,
 		serializerGroup,
 		"",
-		"Book serializer model",
+		"Book serializer update",
 		books.UpdateBookSerializer{},
 	)
-	router.NewGetModelSerializerHandler[structs.BookCreatePayload, structs.Book, structs.BookResponse](
+	router.NewDetailModelSerializerHandler[structs.BookFilter, structs.Book, structs.BookResponse](
 		this.BaseHandler,
 		serializerGroup,
 		"",
+		"Book serializer detail",
+		books.DetailBookSerializer{},
+	)
+	router.NewListModelSerializerHandler[structs.BookFilter, structs.Book, structs.BookResponse](
+		this.BaseHandler,
+		serializerGroup,
+		"",
+		"Book serializer list",
+		books.ListBookSerializer{},
+	)
+	router.NewModelSerializerHandler[structs.BookFilter, structs.BookCreatePayload, structs.Book, structs.BookResponse](
+		this.BaseHandler,
+		serializerModelGroup,
+		"",
 		"Book serializer model",
-		books.GetBookSerializer{},
+		books.BookSerializer{},
 	)
 }

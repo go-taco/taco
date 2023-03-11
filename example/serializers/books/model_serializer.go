@@ -5,6 +5,14 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/serializers"
 )
 
+type BookSerializer struct {
+	bookSerializer
+	serializers.CreateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
+	serializers.UpdateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
+	serializers.DetailModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
+	serializers.ListModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
+}
+
 type CreateBookSerializer struct {
 	bookSerializer
 	serializers.CreateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
@@ -15,7 +23,12 @@ type UpdateBookSerializer struct {
 	serializers.UpdateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
 }
 
-type GetBookSerializer struct {
+type DetailBookSerializer struct {
 	bookSerializer
-	serializers.GetModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
+	serializers.DetailModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
+}
+
+type ListBookSerializer struct {
+	bookSerializer
+	serializers.ListModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
 }

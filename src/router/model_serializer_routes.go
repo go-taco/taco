@@ -9,52 +9,59 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/serializers"
 )
 
-func NewCreateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
-	SetRouteWithSerializer(
+func NewCreateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.CreateSerializerInterface[Payload, Model, Response]) {
+	SetRouteWithDocs(
 		base,
 		router,
 		url,
 		"/create",
 		http.MethodPost,
 		fmt.Sprintf("Create %s", name),
-		serializer,
+		serializers.SerializerToCreateProcessor(serializer),
 	)
 }
 
-func NewUpdateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
+func NewUpdateModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.UpdateSerializerInterface[Payload, Model, Response]) {
 	endpoint := fmt.Sprintf("%s/:id", url)
-	SetRouteWithSerializer(
+	SetRouteWithDocs(
 		base,
 		router,
 		endpoint,
 		"/update",
 		http.MethodPatch,
 		fmt.Sprintf("Update %s", name),
-		serializer,
+		serializers.SerializerToUpdateProcessor(serializer),
 	)
 }
 
-func NewGetModelSerializerHandler[Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Payload, Model, Response]) {
+func NewDetailModelSerializerHandler[Filter, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.DetailSerializerInterface[Filter, Model, Response]) {
 	endpoint := fmt.Sprintf("%s/:id", url)
-	SetRouteWithSerializer(
+	SetRouteWithDocs(
 		base,
 		router,
 		endpoint,
 		"/detail",
 		http.MethodGet,
 		fmt.Sprintf("Detail %s", name),
-		serializer,
+		serializers.SerializerToDetailProcessor(serializer),
 	)
 }
 
-func NewListModelSerializerHandler[Filters any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.Serializer[Filters, Model, Response]) {
-	SetRouteWithSerializer(
+func NewListModelSerializerHandler[Filter any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.ListSerializerInterface[Filter, Model, Response]) {
+	SetRouteWithDocs(
 		base,
 		router,
 		url,
 		"/list",
 		http.MethodGet,
 		fmt.Sprintf("List %s", name),
-		serializer,
+		serializers.SerializerToListProcessor(serializer),
 	)
+}
+
+func NewModelSerializerHandler[Filter any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.ModelSerializerInterface[Filter, Payload, Model, Response]) {
+	NewCreateModelSerializerHandler[Payload, Model, Response](base, router, url, name, serializer)
+	NewUpdateModelSerializerHandler[Payload, Model, Response](base, router, url, name, serializer)
+	NewDetailModelSerializerHandler[Filter, Model, Response](base, router, url, name, serializer)
+	NewListModelSerializerHandler[Filter, Model, Response](base, router, url, name, serializer)
 }
