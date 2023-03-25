@@ -11,7 +11,7 @@ type ToProcessor[Filter any, Payload any, Model any, Response any] func(serializ
 
 func SerializerToCreateProcessor[Payload any, Model any, Response any](serializer CreateSerializerInterface[Payload, Model, Response]) handlers.Processor[model.ModelUrlParams, Payload, Response] {
 	return func(ctx context.Context, urlParams model.ModelUrlParams, payload Payload) (resp Response, err error) {
-		instance, err := serializer.ToModel(ctx, payload)
+		instance, err := serializer.CreateToModel(ctx, payload)
 		if err != nil {
 			return
 		}
@@ -37,7 +37,7 @@ func SerializerToCreateProcessor[Payload any, Model any, Response any](serialize
 
 func SerializerToUpdateProcessor[Payload any, Model any, Response any](serializer UpdateSerializerInterface[Payload, Model, Response]) handlers.Processor[model.ModelUrlParams, Payload, Response] {
 	return func(ctx context.Context, urlParams model.ModelUrlParams, payload Payload) (resp Response, err error) {
-		instance, err := serializer.ToModel(ctx, payload)
+		instance, err := serializer.UpdateToModel(ctx, payload)
 		if err != nil {
 			return
 		}

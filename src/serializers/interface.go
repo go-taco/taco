@@ -6,17 +6,14 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/model"
 )
 
-type SerializerInterface[Payload any, Model any, Response any] interface {
-	ToModel(context.Context, Payload) (Model, error)
-	serializeToResponseInterface[Model, Response]
-}
-
-type serializeToResponseInterface[Model any, Response any] interface {
+type SerializerInterface[Model any, Response any] interface {
 	ToResponse(context.Context, Model) (Response, error)
 }
 
 type CreateSerializerInterface[Payload any, Model any, Response any] interface {
-	SerializerInterface[Payload, Model, Response]
+	SerializerInterface[Model, Response]
+
+	CreateToModel(context.Context, Payload) (Model, error)
 
 	BeforeCreate(context.Context, Model) (Model, error)
 	Create(context.Context, model.ModelUrlParams, Model) (Model, error)
@@ -24,7 +21,9 @@ type CreateSerializerInterface[Payload any, Model any, Response any] interface {
 }
 
 type UpdateSerializerInterface[Payload any, Model any, Response any] interface {
-	SerializerInterface[Payload, Model, Response]
+	SerializerInterface[Model, Response]
+
+	UpdateToModel(context.Context, Payload) (Model, error)
 
 	BeforeUpdate(context.Context, Model) (Model, error)
 	Update(context.Context, model.ModelUrlParams, Model) (Model, error)
@@ -32,20 +31,20 @@ type UpdateSerializerInterface[Payload any, Model any, Response any] interface {
 }
 
 type DetailSerializerInterface[Filter any, Model any, Response any] interface {
-	serializeToResponseInterface[Model, Response]
+	SerializerInterface[Model, Response]
 
 	Detail(context.Context, model.ModelUrlParams, Filter) (Model, error)
 }
 
 type ListSerializerInterface[Filter any, Model any, Response any] interface {
-	serializeToResponseInterface[Model, Response]
+	SerializerInterface[Model, Response]
 
 	List(context.Context, Filter) ([]Model, error)
 }
 
-type ModelSerializerInterface[Filter any, Payload any, Model any, Response any] interface {
-	CreateSerializerInterface[Payload, Model, Response]
-	UpdateSerializerInterface[Payload, Model, Response]
-	DetailSerializerInterface[Filter, Model, Response]
+type ModelSerializerInterface[CreatePayload any, UpdatePayload any, DetailQueryParams any, Filter any, Model any, Response any] interface {
+	CreateSerializerInterface[CreatePayload, Model, Response]
+	UpdateSerializerInterface[UpdatePayload, Model, Response]
+	DetailSerializerInterface[DetailQueryParams, Model, Response]
 	ListSerializerInterface[Filter, Model, Response]
 }

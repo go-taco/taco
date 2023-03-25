@@ -32,7 +32,7 @@ func (this *BookHandler) Routes(d route.Dispatcher) {
 		"Book serializer create",
 		books.CreateBookSerializer{},
 	)
-	router.NewUpdateModelSerializerHandler[structs.BookCreatePayload, structs.Book, structs.BookResponse](
+	router.NewUpdateModelSerializerHandler[structs.BookUpdatePayload, structs.Book, structs.BookResponse](
 		this.BaseHandler,
 		serializerGroup,
 		"",
@@ -53,7 +53,7 @@ func (this *BookHandler) Routes(d route.Dispatcher) {
 		"Book serializer list",
 		books.ListBookSerializer{},
 	)
-	router.NewModelSerializerHandler[structs.BookFilter, structs.BookCreatePayload, structs.Book, structs.BookResponse](
+	router.NewModelSerializerHandler[structs.BookCreatePayload, structs.BookUpdatePayload, struct{}, structs.BookFilter, structs.Book, structs.BookResponse](
 		this.BaseHandler,
 		serializerModelGroup,
 		"",

@@ -7,10 +7,14 @@ import (
 
 type BookSerializer struct {
 	bookSerializer
-	serializers.CreateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
-	serializers.UpdateModelSerializer[structs.BookCreatePayload, structs.Book, structs.BookResponse]
-	serializers.DetailModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
-	serializers.ListModelSerializer[structs.BookFilter, structs.Book, structs.BookResponse]
+	serializers.ModelSerializer[
+		structs.BookFilter,
+		structs.BookCreatePayload,
+		structs.BookUpdatePayload,
+		struct{},
+		structs.Book,
+		structs.BookResponse,
+	]
 }
 
 type CreateBookSerializer struct {

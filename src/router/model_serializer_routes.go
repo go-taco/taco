@@ -59,9 +59,9 @@ func NewListModelSerializerHandler[Filter any, Model any, Response any](base han
 	)
 }
 
-func NewModelSerializerHandler[Filter any, Payload any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.ModelSerializerInterface[Filter, Payload, Model, Response]) {
-	NewCreateModelSerializerHandler[Payload, Model, Response](base, router, url, name, serializer)
-	NewUpdateModelSerializerHandler[Payload, Model, Response](base, router, url, name, serializer)
-	NewDetailModelSerializerHandler[Filter, Model, Response](base, router, url, name, serializer)
+func NewModelSerializerHandler[CreatePayload any, UpdatePayload any, DetailQueryParams any, Filter any, Model any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, serializer serializers.ModelSerializerInterface[CreatePayload, UpdatePayload, DetailQueryParams, Filter, Model, Response]) {
+	NewCreateModelSerializerHandler[CreatePayload, Model, Response](base, router, url, name, serializer)
+	NewUpdateModelSerializerHandler[UpdatePayload, Model, Response](base, router, url, name, serializer)
+	NewDetailModelSerializerHandler[DetailQueryParams, Model, Response](base, router, url, name, serializer)
 	NewListModelSerializerHandler[Filter, Model, Response](base, router, url, name, serializer)
 }

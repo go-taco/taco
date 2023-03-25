@@ -7,7 +7,7 @@ import (
 )
 
 type CreateModelSerializer[Payload any, Model any, Response any] struct {
-	baseModelSerializer[Payload, Model, Response]
+	baseModelSerializer[Payload, any, Model, Response]
 }
 
 func (this CreateModelSerializer[Payload, Model, Response]) Create(ctx context.Context, urlParams model.ModelUrlParams, instance Model) (Model, error) {
@@ -23,7 +23,7 @@ func (this CreateModelSerializer[Payload, Model, Response]) AfterCreate(context.
 }
 
 type UpdateModelSerializer[Payload any, Model any, Response any] struct {
-	baseModelSerializer[Payload, Model, Response]
+	baseModelSerializer[any, Payload, Model, Response]
 }
 
 func (this UpdateModelSerializer[Payload, Model, Response]) Update(ctx context.Context, urlParams model.ModelUrlParams, instance Model) (Model, error) {
@@ -39,7 +39,7 @@ func (this UpdateModelSerializer[Payload, Model, Response]) AfterUpdate(context.
 }
 
 type DetailModelSerializer[Payload any, Model any, Response any] struct {
-	baseModelSerializer[Payload, Model, Response]
+	baseModelSerializer[any, any, Model, Response]
 }
 
 func (this DetailModelSerializer[Payload, Model, Response]) Detail(ctx context.Context, urlParams model.ModelUrlParams, instance Payload) (Model, error) {
@@ -47,17 +47,16 @@ func (this DetailModelSerializer[Payload, Model, Response]) Detail(ctx context.C
 }
 
 type ListModelSerializer[Payload any, Model any, Response any] struct {
-	baseModelSerializer[Payload, Model, Response]
+	baseModelSerializer[any, any, Model, Response]
 }
 
 func (this ListModelSerializer[Payload, Model, Response]) List(ctx context.Context, payload Payload) ([]Model, error) {
 	return model.ListModel[Payload, Model](ctx, struct{}{}, payload)
 }
 
-type ModelSerializer[Payload any, Model any, Response any] struct {
-	baseModelSerializer[Payload, Model, Response]
-	CreateModelSerializer[Payload, Model, Response]
-	UpdateModelSerializer[Payload, Model, Response]
-	DetailModelSerializer[Payload, Model, Response]
-	ListModelSerializer[Payload, Model, Response]
+type ModelSerializer[Filter any, CreatePayload any, UpdatePayload any, DetailQueryParams any, Model any, Response any] struct {
+	CreateModelSerializer[CreatePayload, Model, Response]
+	UpdateModelSerializer[UpdatePayload, Model, Response]
+	DetailModelSerializer[DetailQueryParams, Model, Response]
+	ListModelSerializer[Filter, Model, Response]
 }

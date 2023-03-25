@@ -8,9 +8,15 @@ import (
 
 type bookSerializer struct{}
 
-func (this bookSerializer) ToModel(ctx context.Context, payload structs.BookCreatePayload) (structs.Book, error) {
+func (this bookSerializer) CreateToModel(ctx context.Context, payload structs.BookCreatePayload) (structs.Book, error) {
 	return structs.Book{
 		Title: payload.Title,
+	}, nil
+}
+
+func (this bookSerializer) UpdateToModel(ctx context.Context, payload structs.BookUpdatePayload) (structs.Book, error) {
+	return structs.Book{
+		Author: payload.Author,
 	}, nil
 }
 
@@ -20,5 +26,6 @@ func (this bookSerializer) ToResponse(ctx context.Context, instance structs.Book
 		CreatedAt: instance.CreatedAt,
 		UpdatedAt: instance.UpdatedAt,
 		Title:     instance.Title,
+		Author:    instance.Author,
 	}, nil
 }
