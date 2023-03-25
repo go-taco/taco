@@ -1,14 +1,16 @@
-package handlers
+package common_handlers
 
 import (
 	"context"
 
+	"github.com/yagobatista/taco-go-web-framework/src/handlers"
 	"github.com/yagobatista/taco-go-web-framework/src/route"
+	"github.com/yagobatista/taco-go-web-framework/src/router"
 	"github.com/yagobatista/taco-go-web-framework/src/server"
 )
 
 type DbHealthCheckHandler struct {
-	BaseHandler
+	handlers.BaseHandler
 
 	route route.Route
 }
@@ -22,7 +24,7 @@ func NewDbHealthCheckHandler(route route.Route) *DbHealthCheckHandler {
 func (this *DbHealthCheckHandler) Routes(d route.Dispatcher) {
 	group := d.GetRouter(this.route).Group("health")
 
-	SetGet(
+	router.SetGet(
 		this.BaseHandler,
 		group,
 		"/ping",

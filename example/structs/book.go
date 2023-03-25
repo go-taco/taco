@@ -1,11 +1,33 @@
 package structs
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Book struct {
 	gorm.Model
 
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+type BookCreatePayload struct {
 	Title string `json:"title"`
+}
+
+type BookUpdatePayload struct {
+	Title  string `json:"title"`
+	Author string `json:"author"`
+}
+
+type BookResponse struct {
+	ID        uint      `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	Title     string    `json:"title"`
+	Author    string    `json:"author"`
 }
 
 type BookFilter struct {

@@ -1,13 +1,15 @@
-package handlers
+package router
 
 import (
 	"fmt"
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/yagobatista/taco-go-web-framework/src/handlers"
+	"github.com/yagobatista/taco-go-web-framework/src/model"
 )
 
-func NewCreateModelHandler[Model any](base BaseHandler, router fiber.Router, url string, name string) {
+func NewCreateModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
 	SetRouteWithDocs(
 		base,
 		router,
@@ -15,11 +17,11 @@ func NewCreateModelHandler[Model any](base BaseHandler, router fiber.Router, url
 		"/create",
 		http.MethodPost,
 		fmt.Sprintf("Create %s", name),
-		CreateModel[Model],
+		model.CreateModel[Model],
 	)
 }
 
-func NewUpdateModelHandler[Model any](base BaseHandler, router fiber.Router, url string, name string) {
+func NewUpdateModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithDocs(
 		base,
@@ -28,11 +30,11 @@ func NewUpdateModelHandler[Model any](base BaseHandler, router fiber.Router, url
 		"/update",
 		http.MethodPatch,
 		fmt.Sprintf("Update %s", name),
-		UpdateModel[Model],
+		model.UpdateModel[Model],
 	)
 }
 
-func NewGetModelHandler[Model any](base BaseHandler, router fiber.Router, url string, name string) {
+func NewGetModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithDocs(
 		base,
@@ -41,11 +43,11 @@ func NewGetModelHandler[Model any](base BaseHandler, router fiber.Router, url st
 		"/detail",
 		http.MethodGet,
 		fmt.Sprintf("Detail %s", name),
-		GetModel[Model],
+		model.GetModel[Model],
 	)
 }
 
-func NewListModelHandler[Filters any, Model any](base BaseHandler, router fiber.Router, url string, name string) {
+func NewListModelHandler[Filters any, Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
 	SetRouteWithDocs(
 		base,
 		router,
@@ -53,11 +55,11 @@ func NewListModelHandler[Filters any, Model any](base BaseHandler, router fiber.
 		"/list",
 		http.MethodGet,
 		fmt.Sprintf("List %s", name),
-		ListModel[Filters, Model],
+		model.ListModel[Filters, Model],
 	)
 }
 
-func NewModelHandler[Filters any, Model any](base BaseHandler, router fiber.Router, url string, name string) {
+func NewModelHandler[Filters any, Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
 	NewCreateModelHandler[Model](base, router, url, name)
 	NewUpdateModelHandler[Model](base, router, url, name)
 	NewGetModelHandler[Model](base, router, url, name)
