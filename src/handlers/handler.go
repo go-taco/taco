@@ -23,25 +23,41 @@ type Handler[UrlParams any, Payload any, Response any] struct {
 
 	Processor Processor[UrlParams, Payload, Response]
 	Name      string
+
+	disableTransaction  bool
+	requestMiddlewares  []fiber.Handler
+	responseMiddlewares []fiber.Handler
 }
 
 func (this *Handler[UrlParams, Payload, Response]) Mount() {
+	var completeHandler []fiber.Handler
+
+	completeHandler = append(completeHandler, this.requestMiddlewares...)
+	completeHandler = append(completeHandler, this.Process)
+	completeHandler = append(completeHandler, this.responseMiddlewares...)
+
 	if this.Method == http.MethodPost {
-		this.Router.Post(this.Url, this.Process)
+		this.Router.Post(this.Url, completeHandler...)
 	}
 
 	if this.Method == http.MethodPatch {
-		this.Router.Patch(this.Url, this.Process)
+		this.Router.Patch(this.Url, completeHandler...)
 	}
 
 	if this.Method == http.MethodGet {
-		this.Router.Get(this.Url, this.Process)
+		this.Router.Get(this.Url, completeHandler...)
 	}
 
 	docsUrl := fmt.Sprintf("%s%s/docs", this.Url, this.DocUrl)
 	docRouteName := fmt.Sprintf("%s - %s", this.Method, this.Name)
 
 	this.Router.Get(docsUrl, this.Docs).Name(docRouteName)
+}
+
+func (this *Handler[UrlParams, Payload, Response]) SetConfig(config HandlerConfig) {
+	this.disableTransaction = !config.withTransaction
+	this.requestMiddlewares = config.requestMiddlewares
+	this.requestMiddlewares = config.requestMiddlewares
 }
 
 func (this *Handler[UrlParams, Payload, Response]) Parse(c *fiber.Ctx) (urlParams UrlParams, body Payload, err error) {
@@ -90,7 +106,7 @@ func (this *Handler[UrlParams, Payload, Response]) getStatus() int {
 }
 
 func (this *Handler[UrlParams, Payload, Response]) process(requestCtx context.Context, urlParams UrlParams, payload Payload) (Response, error) {
-	if this.Method == http.MethodGet {
+	if this.Method == http.MethodGet || this.disableTransaction {
 		return this.Processor(requestCtx, urlParams, payload)
 	}
 
