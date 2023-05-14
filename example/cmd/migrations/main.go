@@ -16,7 +16,7 @@ func main() {
 		Port:     5432,
 	}).GetConnection()
 
-	err := conn.Migrator().CreateTable([]any{
+	err := conn.Migrator().AutoMigrate([]any{
 		&structs.Book{},
 	}...)
 	if err != nil {
