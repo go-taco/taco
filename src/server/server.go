@@ -62,7 +62,7 @@ func NewServer(config ServerConfig) *Server {
 	app := fiber.New(getFiberConfig(server.configs))
 
 	server.dbConnection = conn
-	server.port = config.Port
+	server.port = server.configs.Port
 	server.app = app
 
 	for key := range config.Routes {
