@@ -9,20 +9,10 @@ import (
 )
 
 func main() {
-	server.NewServer(&server.ServerConfig{
-		Port: 8000,
+	server.NewServer(server.ServerConfig{
 		Handlers: []server.Handler{
 			common_handlers.NewDbHealthCheckHandler(routes.PUBLIC),
 			&book.BookHandler{},
-		},
-		Docs: true,
-		DatabaseConnections: server.DatabaseConfig{
-			Server:   server.POSTGRES,
-			Host:     "localhost",
-			Name:     "example",
-			User:     "postgres",
-			Password: "postgres",
-			Port:     5432,
 		},
 		Routes: server.Router{
 			routes.PUBLIC: nil,

@@ -13,7 +13,7 @@ import (
 type DatabaseServer string
 
 const (
-	POSTGRES DatabaseServer = "postgres"
+	POSTGRES DatabaseServer = "POSTGRES"
 )
 
 var availableServer = map[DatabaseServer]func(config DatabaseConfig) gorm.Dialector{
@@ -21,13 +21,13 @@ var availableServer = map[DatabaseServer]func(config DatabaseConfig) gorm.Dialec
 }
 
 type DatabaseConfig struct {
-	Disabled bool
-	Server   DatabaseServer
-	Host     string
-	Port     int
-	Name     string
-	User     string
-	Password string
+	Disabled bool           `env:"DB_DISABLED"`
+	Server   DatabaseServer `env:"DB_SERVER"`
+	Host     string         `env:"DB_HOST"`
+	Port     int            `env:"DB_PORT"`
+	Name     string         `env:"DB_NAME"`
+	User     string         `env:"DB_USER"`
+	Password string         `env:"DB_PASSWORD"`
 }
 
 type DatabaseConnection struct {
