@@ -2,12 +2,15 @@ package server
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/imdario/mergo"
+	"github.com/yagobatista/taco-go-web-framework/src/configs"
 	"github.com/yagobatista/taco-go-web-framework/src/middlewares"
 	"github.com/yagobatista/taco-go-web-framework/src/route"
 )
@@ -25,9 +28,9 @@ type Router map[route.Route][]middlewares.Middleware
 
 type ServerConfig struct {
 	DatabaseConnections DatabaseConfig
-	Docs                bool
+	DisableDocs         bool `env:"DISABLE_DOCS"`
 	AsyncTask           bool
-	Port                int
+	Port                int `env:"PORT"`
 
 	Handlers []Handler
 
@@ -40,6 +43,8 @@ type Server struct {
 	dbConnection *DatabaseConnection
 	app          *fiber.App
 
+	configs ServerConfig
+
 	services []Shutdown
 
 	routes []route.Route
@@ -47,38 +52,55 @@ type Server struct {
 	port int
 }
 
-func NewServer(config *ServerConfig) *Server {
-	conn := NewDatabaseConnection(config.DatabaseConnections)
+func NewServer(config ServerConfig) *Server {
+	var server Server
 
-	app := fiber.New(getFiberConfig(config))
+	server.setConfigs(config)
 
-	server := &Server{
-		dbConnection: conn,
-		port:         config.Port,
-		app:          app,
-	}
+	conn := NewDatabaseConnection(server.configs.DatabaseConnections)
+
+	app := fiber.New(getFiberConfig(server.configs))
+
+	server.dbConnection = conn
+	server.port = server.configs.Port
+	server.app = app
 
 	for key := range config.Routes {
 		server.routes = append(server.routes, key)
 	}
 
-	server.loadRoutes(*config)
-	server.buildDocs(*config)
+	server.loadRoutes()
+	server.buildDocs()
 
-	return server
+	return &server
 }
 
-func (this *Server) loadRoutes(serverConfig ServerConfig) {
-	handlers := serverConfig.Handlers
+func (this *Server) setConfigs(config ServerConfig) {
+	this.configs = config
 
-	mainRouter := this.setMainRouter(serverConfig.MainMiddlewares)
+	cfg, err := configs.LoadEnvs[ServerConfig]()
+	if err != nil {
+		log.Printf("failed to load env file. Error: %v", err)
+		return
+	}
+
+	err = mergo.Merge(&this.configs, cfg)
+	if err != nil {
+		log.Panic(err)
+	}
+}
+
+func (this *Server) loadRoutes() {
+	handlers := this.configs.Handlers
+
+	mainRouter := this.setMainRouter(this.configs.MainMiddlewares)
 
 	routerDispatcher := route.NewDispatcher(
 		mainRouter,
 		this.routes...,
 	)
 
-	for route, middleware := range serverConfig.Routes {
+	for route, middleware := range this.configs.Routes {
 		if middleware == nil {
 			continue
 		}

@@ -5,9 +5,9 @@ import (
 	"github.com/gofiber/template/html"
 )
 
-func getFiberConfig(serverConfig *ServerConfig) (fiberConfig fiber.Config) {
+func getFiberConfig(serverConfig ServerConfig) (fiberConfig fiber.Config) {
 
-	if serverConfig.Docs {
+	if serverConfig.DisableDocs {
 		eng := html.New("./", ".html")
 		eng.Reload(true)
 		fiberConfig.Views = eng
