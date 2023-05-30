@@ -2,13 +2,13 @@ package main
 
 import (
 	"github.com/yagobatista/taco-go-web-framework/example/structs"
-	"github.com/yagobatista/taco-go-web-framework/src/server"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 )
 
 func main() {
 	// migration
-	conn := server.NewDatabaseConnection(server.DatabaseConfig{
-		Server:   server.POSTGRES,
+	conn := database.NewDatabaseConnection(database.DatabaseConfig{
+		Server:   database.POSTGRES,
 		Host:     "localhost",
 		Name:     "example",
 		User:     "postgres",

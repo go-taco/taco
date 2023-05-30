@@ -7,7 +7,7 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/handlers"
 )
 
-func SetRouteWithDocs[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, docsUrl, method string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
+func SetRouteWithDocs[UrlParams any, Payload any, Response any](router fiber.Router, url string, docsUrl, method string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
 	handler := handlers.Handler[UrlParams, Payload, Response]{
 		Url:       url,
 		DocUrl:    docsUrl,
@@ -24,13 +24,11 @@ func SetRouteWithDocs[UrlParams any, Payload any, Response any](base handlers.Ba
 
 	handler.SetConfig(config)
 
-	handler.SetServer(base.GetServer())
 	handler.Mount()
 }
 
-func SetRoute[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, method string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
+func SetRoute[UrlParams any, Payload any, Response any](router fiber.Router, url string, method string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
 	SetRouteWithDocs(
-		base,
 		router,
 		url,
 		"",
@@ -41,10 +39,10 @@ func SetRoute[UrlParams any, Payload any, Response any](base handlers.BaseHandle
 	)
 }
 
-func SetPost[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
-	SetRoute(base, router, url, http.MethodPost, name, processor, options...)
+func SetPost[UrlParams any, Payload any, Response any](router fiber.Router, url string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
+	SetRoute(router, url, http.MethodPost, name, processor, options...)
 }
 
-func SetGet[UrlParams any, Payload any, Response any](base handlers.BaseHandler, router fiber.Router, url string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
-	SetRoute(base, router, url, http.MethodGet, name, processor, options...)
+func SetGet[UrlParams any, Payload any, Response any](router fiber.Router, url string, name string, processor handlers.Processor[UrlParams, Payload, Response], options ...handlers.Option) {
+	SetRoute(router, url, http.MethodGet, name, processor, options...)
 }

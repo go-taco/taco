@@ -5,13 +5,11 @@ import (
 	"net/http"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/yagobatista/taco-go-web-framework/src/handlers"
 	"github.com/yagobatista/taco-go-web-framework/src/model"
 )
 
-func NewCreateModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
+func NewCreateModelHandler[Model any](router fiber.Router, url string, name string) {
 	SetRouteWithDocs(
-		base,
 		router,
 		url,
 		"/create",
@@ -21,10 +19,9 @@ func NewCreateModelHandler[Model any](base handlers.BaseHandler, router fiber.Ro
 	)
 }
 
-func NewUpdateModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
+func NewUpdateModelHandler[Model any](router fiber.Router, url string, name string) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithDocs(
-		base,
 		router,
 		endpoint,
 		"/update",
@@ -34,10 +31,9 @@ func NewUpdateModelHandler[Model any](base handlers.BaseHandler, router fiber.Ro
 	)
 }
 
-func NewGetModelHandler[Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
+func NewGetModelHandler[Model any](router fiber.Router, url string, name string) {
 	endpoint := fmt.Sprintf("%s/:id", url)
 	SetRouteWithDocs(
-		base,
 		router,
 		endpoint,
 		"/detail",
@@ -47,9 +43,8 @@ func NewGetModelHandler[Model any](base handlers.BaseHandler, router fiber.Route
 	)
 }
 
-func NewListModelHandler[Filters any, Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
+func NewListModelHandler[Filters any, Model any](router fiber.Router, url string, name string) {
 	SetRouteWithDocs(
-		base,
 		router,
 		url,
 		"/list",
@@ -59,9 +54,9 @@ func NewListModelHandler[Filters any, Model any](base handlers.BaseHandler, rout
 	)
 }
 
-func NewModelHandler[Filters any, Model any](base handlers.BaseHandler, router fiber.Router, url string, name string) {
-	NewCreateModelHandler[Model](base, router, url, name)
-	NewUpdateModelHandler[Model](base, router, url, name)
-	NewGetModelHandler[Model](base, router, url, name)
-	NewListModelHandler[Filters, Model](base, router, url, name)
+func NewModelHandler[Filters any, Model any](router fiber.Router, url string, name string) {
+	NewCreateModelHandler[Model](router, url, name)
+	NewUpdateModelHandler[Model](router, url, name)
+	NewGetModelHandler[Model](router, url, name)
+	NewListModelHandler[Filters, Model](router, url, name)
 }

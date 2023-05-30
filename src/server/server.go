@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/imdario/mergo"
 	"github.com/yagobatista/taco-go-web-framework/src/configs"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 	"github.com/yagobatista/taco-go-web-framework/src/middlewares"
 	"github.com/yagobatista/taco-go-web-framework/src/route"
 )
@@ -20,14 +21,13 @@ type Shutdown interface {
 }
 
 type Handler interface {
-	SetServer(server *Server)
 	Routes(d route.Dispatcher)
 }
 
 type Router map[route.Route][]middlewares.Middleware
 
 type ServerConfig struct {
-	DatabaseConnections DatabaseConfig
+	DatabaseConnections database.DatabaseConfig
 	DisableDocs         bool `env:"DISABLE_DOCS"`
 	AsyncTask           bool
 	Port                int `env:"PORT"`
@@ -40,7 +40,7 @@ type ServerConfig struct {
 }
 
 type Server struct {
-	dbConnection *DatabaseConnection
+	dbConnection *database.DatabaseConnection
 	app          *fiber.App
 
 	configs ServerConfig
@@ -108,7 +108,6 @@ func (this *Server) loadRoutes() {
 	}
 
 	for _, handler := range handlers {
-		handler.SetServer(this)
 		handler.Routes(routerDispatcher)
 	}
 }

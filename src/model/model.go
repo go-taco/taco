@@ -3,7 +3,7 @@ package model
 import (
 	"context"
 
-	"github.com/yagobatista/taco-go-web-framework/src/server"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 )
 
 type ModelUrlParams struct {
@@ -11,7 +11,7 @@ type ModelUrlParams struct {
 }
 
 func CreateModel[Model any](ctx context.Context, urlParams struct{}, payload Model) (Model, error) {
-	err := server.GetConnectionFromCtx(ctx).
+	err := database.GetConnectionFromCtx(ctx).
 		Create(&payload).
 		Error
 
@@ -21,7 +21,7 @@ func CreateModel[Model any](ctx context.Context, urlParams struct{}, payload Mod
 func UpdateModel[Model any](ctx context.Context, urlParams ModelUrlParams, payload Model) (Model, error) {
 	var model Model
 
-	conn := server.GetConnectionFromCtx(ctx)
+	conn := database.GetConnectionFromCtx(ctx)
 
 	err := conn.
 		Model(model).
@@ -50,7 +50,7 @@ func GetModel[Model any](ctx context.Context, urlParams ModelUrlParams, payload 
 	var model Model
 	var instance Model
 
-	err := server.GetConnectionFromCtx(ctx).
+	err := database.GetConnectionFromCtx(ctx).
 		Model(model).
 		Where("id = ?", urlParams.ID).
 		Find(&instance).
