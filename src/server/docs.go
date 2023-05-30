@@ -5,8 +5,8 @@ import (
 	"github.com/yagobatista/taco-go-web-framework/src/docs"
 )
 
-func (this *Server) buildDocs(serverConfig ServerConfig) {
-	if !serverConfig.Docs {
+func (this *Server) buildDocs() {
+	if this.configs.DisableDocs {
 		return
 	}
 
