@@ -7,16 +7,30 @@ import (
 
 func main() {
 	// migration
+	dbName := "example"
+
+	err := database.CreateDB(dbName, database.DatabaseConfig{
+		Server:   database.POSTGRES,
+		Host:     "localhost",
+		Name:     "postgres",
+		User:     "postgres",
+		Password: "postgres",
+		Port:     5432,
+	})
+	if err != nil {
+		panic(err)
+	}
+
 	conn := database.NewDatabaseConnection(database.DatabaseConfig{
 		Server:   database.POSTGRES,
 		Host:     "localhost",
-		Name:     "example",
+		Name:     dbName,
 		User:     "postgres",
 		Password: "postgres",
 		Port:     5432,
 	}).GetConnection()
 
-	err := conn.Migrator().AutoMigrate([]any{
+	err = conn.Migrator().AutoMigrate([]any{
 		&structs.Book{},
 	}...)
 	if err != nil {

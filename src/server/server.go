@@ -27,10 +27,10 @@ type Handler interface {
 type Router map[route.Route][]middlewares.Middleware
 
 type ServerConfig struct {
-	DatabaseConnections database.DatabaseConfig
-	DisableDocs         bool `env:"DISABLE_DOCS"`
-	AsyncTask           bool
-	Port                int `env:"PORT"`
+	DatabaseConfig database.DatabaseConfig
+	DisableDocs    bool `env:"DISABLE_DOCS"`
+	AsyncTask      bool
+	Port           int `env:"PORT"`
 
 	Handlers []Handler
 
@@ -57,7 +57,7 @@ func NewServer(config ServerConfig) *Server {
 
 	server.setConfigs(config)
 
-	conn := database.NewDatabaseConnection(server.configs.DatabaseConnections)
+	conn := database.NewDatabaseConnection(server.configs.DatabaseConfig)
 
 	app := fiber.New(getFiberConfig(server.configs))
 
@@ -73,6 +73,14 @@ func NewServer(config ServerConfig) *Server {
 	server.buildDocs()
 
 	return &server
+}
+
+func (this *Server) GetConnection() *database.DatabaseConnection {
+	return this.dbConnection
+}
+
+func (this *Server) GetFiberApp() *fiber.App {
+	return this.app
 }
 
 func (this *Server) setConfigs(config ServerConfig) {
