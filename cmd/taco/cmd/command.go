@@ -27,7 +27,7 @@ func runAndWatchCommand(command *exec.Cmd) {
 	scanner := bufio.NewScanner(io.MultiReader(stdout, stderr))
 	for scanner.Scan() {
 		m := scanner.Text()
-		fmt.Print(m)
+		fmt.Println(m)
 	}
 
 	err = command.Wait()
