@@ -39,7 +39,7 @@ func (this *DbHealthCheckHandler) Ping(ctx context.Context, urlParams struct{}, 
 
 	err = db.Ping()
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
 	return "pong", nil

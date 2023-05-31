@@ -13,16 +13,28 @@ func TestHealthCheckSuite(t *testing.T) {
 }
 
 type HealthCheckSuite struct {
-	suite.IntegrationSuite
+	suite.ModelIntegrationSuite
 }
 
 func (this *HealthCheckSuite) SetupTest() {
 	this.SetServerConfig(setup.GetServerConfig())
-	this.IntegrationSuite.SetupTest()
+	this.ModelIntegrationSuite.SetupTest()
 }
 
 func (this *HealthCheckSuite) TestPing() {
 	statusCode := this.Client.Get("/api/health/ping")
 
 	this.Equal(http.StatusOK, statusCode)
+}
+
+func (this *HealthCheckSuite) TestClosedConnection() {
+	db, err := this.ModelIntegrationSuite.Conn.DB()
+	this.Require().NoError(err, "failed to get DB")
+
+	err = db.Close()
+	this.Require().NoError(err, "failed to close connection")
+
+	statusCode := this.Client.Get("/api/health/ping")
+
+	this.Equal(http.StatusInternalServerError, statusCode)
 }
