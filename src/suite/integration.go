@@ -72,6 +72,11 @@ func (this *IntegrationSuite) loadEnv() {
 		return
 	}
 
+	err = cleanenv.ReadConfig("../../.test.env", &this.serverConfig)
+	if err == nil {
+		return
+	}
+
 	err = cleanenv.ReadEnv(&this.serverConfig)
 	if err != nil {
 		this.FailNow("failed to load database envs")
