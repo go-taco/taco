@@ -89,7 +89,7 @@ func (this *IntegrationSuite) createDB() {
 
 	dbName := this.serverConfig.DatabaseConfig.Name
 	if dbName == "postgres" || dbName == "" {
-		this.FailNow("DB_NAME can not be postgres ou empty")
+		this.FailNow("DB_NAME can not be 'postgres' or empty")
 	}
 
 	dbName, _ = strings.CutSuffix(dbName, "_test")
