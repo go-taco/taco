@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/yagobatista/taco-go-web-framework/example/cmd/setup"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 	"github.com/yagobatista/taco-go-web-framework/src/suite"
 )
 
@@ -28,7 +29,7 @@ func (this *HealthCheckSuite) TestPing() {
 }
 
 func (this *HealthCheckSuite) TestClosedConnection() {
-	db, err := this.ModelIntegrationSuite.Conn.DB()
+	db, err := database.GetConnectionFromCtx(this.Ctx).DB()
 	this.Require().NoError(err, "failed to get DB")
 
 	err = db.Close()

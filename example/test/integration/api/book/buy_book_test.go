@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/yagobatista/taco-go-web-framework/example/cmd/setup"
+	"github.com/yagobatista/taco-go-web-framework/example/handlers/book"
 	"github.com/yagobatista/taco-go-web-framework/src/suite"
 )
 
@@ -19,10 +20,16 @@ type BuyBookSuite struct {
 func (this *BuyBookSuite) SetupTest() {
 	this.SetServerConfig(setup.GetServerConfig())
 	this.ModelIntegrationSuite.SetupTest()
+	this.Client.SetBasicAuth("admin2", "admin2")
 }
 
 func (this *BuyBookSuite) TestDisabledFeature() {
-	statusCode := this.Client.Post("/internal/book/2/buy")
+	statusCode, _ := this.Client.Postf(
+		book.BuyBookPayload{
+			Quantity: 2,
+		},
+		"/internal/book/%d/buy", 2,
+	)
 
 	this.Equal(http.StatusInternalServerError, statusCode)
 }

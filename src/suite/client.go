@@ -1,6 +1,8 @@
 package suite
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,9 @@ import (
 type Client struct {
 	*suite.Suite
 	app *fiber.App
+
+	username string
+	password string
 }
 
 func NewClient(server *server.Server, suite *suite.Suite) Client {
@@ -22,25 +27,44 @@ func NewClient(server *server.Server, suite *suite.Suite) Client {
 	}
 }
 
+func (this *Client) SetBasicAuth(username, password string) {
+	this.username = username
+	this.password = password
+}
+
 func (this *Client) Get(endpoint string) (statusCode int) {
 	req := httptest.NewRequest(http.MethodGet, endpoint, nil)
 
-	resp, err := this.app.Test(req)
+	resp, err := this.app.Test(req, 3213213213)
 	this.Require().NoError(err, "request failed")
 
 	return resp.StatusCode
 }
 
-func (this *Client) Post(endpoint string) (statusCode int) {
+func (this *Client) Post(body any, endpoint string) (statusCode int, response any) {
+	var buf bytes.Buffer
 
-	req := httptest.NewRequest(http.MethodPost, endpoint, nil)
+	err := json.NewEncoder(&buf).Encode(body)
+	this.Require().NoError(err, "failed to encode body")
 
-	resp, err := this.app.Test(req)
+	req := httptest.NewRequest(http.MethodPost, endpoint, &buf)
+
+	if this.username != "" || this.password != "" {
+		req.SetBasicAuth(this.username, this.password)
+	}
+
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := this.app.Test(req, 3213213213)
 	this.Require().NoError(err, "request failed")
 
-	return resp.StatusCode
+	defer resp.Body.Close()
+
+	json.NewDecoder(resp.Body).Decode(&response)
+
+	return resp.StatusCode, response
 }
 
-func (this *Client) Postf(endpoint string, args ...any) (statusCode int) {
-	return this.Post(fmt.Sprintf(endpoint, args...))
+func (this *Client) Postf(body any, endpoint string, args ...any) (statusCode int, response any) {
+	return this.Post(body, fmt.Sprintf(endpoint, args...))
 }

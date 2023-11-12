@@ -17,6 +17,6 @@ func NewProjectConfigs[T any]() Middleware {
 		ctx := c.UserContext()
 		ctx = configs.SetToCtx(ctx, cfg)
 		c.SetUserContext(ctx)
-		return nil
+		return c.Next()
 	}
 }
