@@ -3,12 +3,13 @@ package configs
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 func LoadEnvs[T any]() (configs T, err error) {
-	env := os.Getenv("ENV")
+	env := strings.ToLower(os.Getenv("ENV"))
 	if env == "" {
 		env = "local"
 	}
