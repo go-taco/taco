@@ -8,14 +8,14 @@ import (
 )
 
 func LoadEnvs[T any]() (configs T, err error) {
-	mode := os.Getenv("MODE")
-	if mode == "" {
-		mode = "local"
+	env := os.Getenv("ENV")
+	if env == "" {
+		env = "local"
 	}
 
 	path := os.Getenv("CONFIG_FILE_PATH")
 
-	filePath := fmt.Sprintf("%s.%s.env", path, mode)
+	filePath := fmt.Sprintf("%s.%s.env", path, env)
 
 	err = cleanenv.ReadConfig(filePath, &configs)
 
