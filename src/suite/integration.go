@@ -61,12 +61,7 @@ func (this *IntegrationSuite) SetTables(tables []any) {
 }
 
 func (this *IntegrationSuite) loadEnv() {
-	err := cleanenv.ReadConfig("../.test.env", &this.serverConfig)
-	if err == nil {
-		return
-	}
-
-	err = cleanenv.ReadConfig("../../.test.env", &this.serverConfig)
+	err := cleanenv.ReadConfig("../../.test.env", &this.serverConfig)
 	if err == nil {
 		return
 	}
