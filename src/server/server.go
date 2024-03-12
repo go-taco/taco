@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -75,8 +76,17 @@ func NewServer(config ServerConfig) *Server {
 	return &server
 }
 
-func (this *Server) GetConnection() *database.DatabaseConnection {
-	return this.dbConnection
+func (this *Server) SetDBConnectionToTestMode() context.Context {
+	conn := this.dbConnection.GetConnection()
+
+	ctx := context.Background()
+
+	tx := conn.WithContext(ctx).Begin()
+
+	ctx = database.SetConnectionToCtx(ctx, tx)
+	this.dbConnection.SetConnection(tx)
+
+	return ctx
 }
 
 func (this *Server) GetFiberApp() *fiber.App {

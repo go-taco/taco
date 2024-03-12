@@ -11,6 +11,8 @@ type Book struct {
 
 	Title  string `json:"title"`
 	Author string `json:"author"`
+
+	AvailableCopies uint64 `json:"available_copies"`
 }
 
 type BookCreatePayload struct {

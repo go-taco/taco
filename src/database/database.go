@@ -56,6 +56,10 @@ func (this *DatabaseConnection) GetConnection() *gorm.DB {
 	return this.conn
 }
 
+func (this *DatabaseConnection) SetConnection(conn *gorm.DB) {
+	this.conn = conn
+}
+
 func postgresDialector(config DatabaseConfig) gorm.Dialector {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",

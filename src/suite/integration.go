@@ -38,13 +38,7 @@ func (this *IntegrationSuite) SetupTest() {
 
 	this.Client = NewClient(this.server, &this.Suite)
 
-	conn := this.server.GetConnection().GetConnection()
-
-	this.Ctx = context.Background()
-
-	tx := conn.WithContext(this.Ctx).Begin()
-
-	this.Ctx = database.SetConnectionToCtx(this.Ctx, tx)
+	this.Ctx = this.server.SetDBConnectionToTestMode()
 }
 
 func (this *IntegrationSuite) RollbackTest() {
