@@ -3,7 +3,7 @@
 This is a simple api using taco framework to manage and buy books from a bookstore
 
 ### To run:
-    $ docker compose up # starts database
+    $ docker-compose up # starts database
     $ go run cmd/api/main.go # starts server
 
 ### To ping with DB connection check:

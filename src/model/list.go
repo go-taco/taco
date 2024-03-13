@@ -7,14 +7,14 @@ import (
 	"strings"
 
 	"github.com/gobeam/stringy"
-	"github.com/yagobatista/taco-go-web-framework/src/server"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 	"gorm.io/gorm/clause"
 )
 
 func ListModel[Filters any, Model any](ctx context.Context, urlParams struct{}, filters Filters) (results []Model, err error) {
 	var model Model
 
-	err = server.GetConnectionFromCtx(ctx).
+	err = database.GetConnectionFromCtx(ctx).
 		Model(model).
 		Where(getFilters(filters)).
 		Find(&results).

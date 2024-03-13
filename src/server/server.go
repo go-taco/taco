@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -11,6 +12,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/imdario/mergo"
 	"github.com/yagobatista/taco-go-web-framework/src/configs"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 	"github.com/yagobatista/taco-go-web-framework/src/middlewares"
 	"github.com/yagobatista/taco-go-web-framework/src/route"
 )
@@ -20,17 +22,16 @@ type Shutdown interface {
 }
 
 type Handler interface {
-	SetServer(server *Server)
 	Routes(d route.Dispatcher)
 }
 
 type Router map[route.Route][]middlewares.Middleware
 
 type ServerConfig struct {
-	DatabaseConnections DatabaseConfig
-	DisableDocs         bool `env:"DISABLE_DOCS"`
-	AsyncTask           bool
-	Port                int `env:"PORT"`
+	DatabaseConfig database.DatabaseConfig
+	DisableDocs    bool `env:"DISABLE_DOCS"`
+	AsyncTask      bool
+	Port           int `env:"PORT"`
 
 	Handlers []Handler
 
@@ -40,7 +41,7 @@ type ServerConfig struct {
 }
 
 type Server struct {
-	dbConnection *DatabaseConnection
+	dbConnection *database.DatabaseConnection
 	app          *fiber.App
 
 	configs ServerConfig
@@ -57,7 +58,7 @@ func NewServer(config ServerConfig) *Server {
 
 	server.setConfigs(config)
 
-	conn := NewDatabaseConnection(server.configs.DatabaseConnections)
+	conn := database.NewDatabaseConnection(server.configs.DatabaseConfig)
 
 	app := fiber.New(getFiberConfig(server.configs))
 
@@ -73,6 +74,23 @@ func NewServer(config ServerConfig) *Server {
 	server.buildDocs()
 
 	return &server
+}
+
+func (this *Server) SetDBConnectionToTestMode() context.Context {
+	conn := this.dbConnection.GetConnection()
+
+	ctx := context.Background()
+
+	tx := conn.WithContext(ctx).Begin()
+
+	ctx = database.SetConnectionToCtx(ctx, tx)
+	this.dbConnection.SetConnection(tx)
+
+	return ctx
+}
+
+func (this *Server) GetFiberApp() *fiber.App {
+	return this.app
 }
 
 func (this *Server) setConfigs(config ServerConfig) {
@@ -108,7 +126,6 @@ func (this *Server) loadRoutes() {
 	}
 
 	for _, handler := range handlers {
-		handler.SetServer(this)
 		handler.Routes(routerDispatcher)
 	}
 }

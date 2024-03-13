@@ -7,14 +7,12 @@ import (
 
 	"github.com/go-playground/validator"
 	"github.com/gofiber/fiber/v2"
-	"github.com/yagobatista/taco-go-web-framework/src/server"
+	"github.com/yagobatista/taco-go-web-framework/src/database"
 )
 
 type Processor[UrlParams any, Body any, Response any] func(ctx context.Context, UrlParams UrlParams, input Body) (Response, error)
 
 type Handler[UrlParams any, Payload any, Response any] struct {
-	BaseHandler
-
 	Url    string
 	DocUrl string
 
@@ -110,9 +108,8 @@ func (this *Handler[UrlParams, Payload, Response]) process(requestCtx context.Co
 		return this.Processor(requestCtx, urlParams, payload)
 	}
 
-	return server.RunWithTransaction(
+	return database.RunWithTransaction(
 		requestCtx,
-		this.GetServer(),
 		func(ctx context.Context) (Response, error) {
 			return this.Processor(ctx, urlParams, payload)
 		},

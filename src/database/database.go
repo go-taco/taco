@@ -1,11 +1,9 @@
-package server
+package database
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/yagobatista/taco-go-web-framework/src/middlewares"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -58,6 +56,10 @@ func (this *DatabaseConnection) GetConnection() *gorm.DB {
 	return this.conn
 }
 
+func (this *DatabaseConnection) SetConnection(conn *gorm.DB) {
+	this.conn = conn
+}
+
 func postgresDialector(config DatabaseConfig) gorm.Dialector {
 	dsn := fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%d sslmode=disable",
@@ -70,10 +72,10 @@ func postgresDialector(config DatabaseConfig) gorm.Dialector {
 	return postgres.Open(dsn)
 }
 
-func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(ctx context.Context) (Result, error)) (Result, error) {
-	var result Result
+func RunWithTransaction[Result any](ctx context.Context, f func(ctx context.Context) (Result, error)) (result Result, err error) {
+	globalConnection := GetConnectionFromCtx(ctx)
 
-	err := server.dbConnection.conn.Transaction(func(tx *gorm.DB) (err error) {
+	err = globalConnection.Transaction(func(tx *gorm.DB) (err error) {
 		newCtx := SetConnectionToCtx(ctx,
 			tx.WithContext(ctx),
 		)
@@ -82,17 +84,7 @@ func RunWithTransaction[Result any](ctx context.Context, server *Server, f func(
 		return err
 	})
 
-	return result, err
-}
-
-func connectionMiddleware(server *Server) middlewares.Middleware {
-	return func(c *fiber.Ctx) error {
-		ctx := SetConnectionToCtx(c.UserContext(), server.dbConnection.conn)
-
-		c.SetUserContext(ctx)
-
-		return c.Next()
-	}
+	return
 }
 
 func GetConnectionFromCtx(ctx context.Context) *gorm.DB {
