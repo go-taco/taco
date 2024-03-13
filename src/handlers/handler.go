@@ -31,20 +31,10 @@ func (this *Handler[UrlParams, Payload, Response]) Mount() {
 	var completeHandler []fiber.Handler
 
 	completeHandler = append(completeHandler, this.requestMiddlewares...)
+	completeHandler = append(completeHandler, this.getResponseMiddlewares()...)
 	completeHandler = append(completeHandler, this.Process)
-	completeHandler = append(completeHandler, this.responseMiddlewares...)
 
-	if this.Method == http.MethodPost {
-		this.Router.Post(this.Url, completeHandler...)
-	}
-
-	if this.Method == http.MethodPatch {
-		this.Router.Patch(this.Url, completeHandler...)
-	}
-
-	if this.Method == http.MethodGet {
-		this.Router.Get(this.Url, completeHandler...)
-	}
+	this.Router.Add(this.Method, this.Url, completeHandler...)
 
 	docsUrl := fmt.Sprintf("%s%s/docs", this.Url, this.DocUrl)
 	docRouteName := fmt.Sprintf("%s - %s", this.Method, this.Name)
@@ -52,10 +42,20 @@ func (this *Handler[UrlParams, Payload, Response]) Mount() {
 	this.Router.Get(docsUrl, this.Docs).Name(docRouteName)
 }
 
+func (this *Handler[UrlParams, Payload, Response]) getResponseMiddlewares() (parserResponseMiddlewares []fiber.Handler) {
+	for _, middleware := range this.responseMiddlewares {
+		parserResponseMiddlewares = append(parserResponseMiddlewares, func(c *fiber.Ctx) error {
+			c.Next()
+			return middleware(c)
+		})
+	}
+	return
+}
+
 func (this *Handler[UrlParams, Payload, Response]) SetConfig(config HandlerConfig) {
 	this.disableTransaction = !config.withTransaction
 	this.requestMiddlewares = config.requestMiddlewares
-	this.requestMiddlewares = config.requestMiddlewares
+	this.responseMiddlewares = config.responseMiddlewares
 }
 
 func (this *Handler[UrlParams, Payload, Response]) Parse(c *fiber.Ctx) (urlParams UrlParams, body Payload, err error) {

@@ -1,6 +1,9 @@
 package book
 
 import (
+	"log"
+
+	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/basicauth"
 	"github.com/yagobatista/taco-go-web-framework/example/dtos"
 	"github.com/yagobatista/taco-go-web-framework/example/models"
@@ -29,6 +32,14 @@ func (this *BookHandler) Routes(d route.Dispatcher) {
 			basicauth.New(basicauth.Config{
 				Users: map[string]string{"admin2": "admin2"},
 			}),
+		),
+		handlers.WithResponseMiddlewares(func(c *fiber.Ctx) error {
+			log.Printf("response status %d", c.Response().StatusCode())
+			return nil
+		}, func(c *fiber.Ctx) error {
+			log.Printf("response body %s", c.Response().Body())
+			return nil
+		},
 		),
 	)
 
