@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/yagobatista/taco-go-web-framework/example/structs"
+	"github.com/yagobatista/taco-go-web-framework/example/cmd/setup"
 	"github.com/yagobatista/taco-go-web-framework/src/database"
 )
 
@@ -30,9 +30,7 @@ func main() {
 		Port:     5432,
 	}).GetConnection()
 
-	err = conn.Migrator().AutoMigrate([]any{
-		&structs.Book{},
-	}...)
+	err = conn.Migrator().AutoMigrate(setup.GetModelsRegistry()...)
 	if err != nil {
 		panic(err)
 	}

@@ -3,35 +3,36 @@ package books
 import (
 	"context"
 
-	"github.com/yagobatista/taco-go-web-framework/example/structs"
+	"github.com/yagobatista/taco-go-web-framework/example/dtos"
+	"github.com/yagobatista/taco-go-web-framework/example/models"
 	"github.com/yagobatista/taco-go-web-framework/src/serializers"
 )
 
 type BookSerializer struct {
 	serializers.ModelSerializer[
-		structs.BookFilter,
-		structs.BookCreatePayload,
-		structs.BookUpdatePayload,
+		dtos.BookFilter,
+		dtos.BookCreatePayload,
+		dtos.BookUpdatePayload,
 		struct{},
-		structs.Book,
-		structs.BookResponse,
+		models.Book,
+		dtos.BookResponse,
 	]
 }
 
-func (this BookSerializer) CreateToModel(ctx context.Context, payload structs.BookCreatePayload) (structs.Book, error) {
-	return structs.Book{
+func (this BookSerializer) CreateToModel(ctx context.Context, payload dtos.BookCreatePayload) (models.Book, error) {
+	return models.Book{
 		Title: payload.Title,
 	}, nil
 }
 
-func (this BookSerializer) UpdateToModel(ctx context.Context, payload structs.BookUpdatePayload) (structs.Book, error) {
-	return structs.Book{
+func (this BookSerializer) UpdateToModel(ctx context.Context, payload dtos.BookUpdatePayload) (models.Book, error) {
+	return models.Book{
 		Author: payload.Author,
 	}, nil
 }
 
-func (this BookSerializer) ToResponse(ctx context.Context, instance structs.Book) (structs.BookResponse, error) {
-	return structs.BookResponse{
+func (this BookSerializer) ToResponse(ctx context.Context, instance models.Book) (dtos.BookResponse, error) {
+	return dtos.BookResponse{
 		ID:        instance.ID,
 		CreatedAt: instance.CreatedAt,
 		UpdatedAt: instance.UpdatedAt,

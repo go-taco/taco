@@ -16,7 +16,7 @@ type ModelIntegrationSuite struct {
 }
 
 func (this *ModelIntegrationSuite) SetupSuite() {
-	this.SetTables(setup.GetTables())
+	this.SetTables(setup.GetModelsRegistry())
 	this.ModelIntegrationSuite.SetupSuite()
 }
 

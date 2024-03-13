@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/yagobatista/taco-go-web-framework/example/handlers/book"
-	"github.com/yagobatista/taco-go-web-framework/example/structs"
+	"github.com/yagobatista/taco-go-web-framework/example/models"
 	"github.com/yagobatista/taco-go-web-framework/example/test/suite"
 )
 
@@ -23,7 +23,7 @@ func (this *BuyBookSuite) SetupTest() {
 }
 
 func (this *BuyBookSuite) TestValidCopies() {
-	instance := structs.Book{
+	instance := models.Book{
 		Title:           "My book",
 		Author:          "Me",
 		AvailableCopies: 25,
@@ -41,7 +41,7 @@ func (this *BuyBookSuite) TestValidCopies() {
 }
 
 func (this *BuyBookSuite) TestBuyTooMuchCopies() {
-	instance := structs.Book{
+	instance := models.Book{
 		Title:           "My book",
 		Author:          "Me",
 		AvailableCopies: 25,

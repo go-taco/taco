@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	project_configs "github.com/yagobatista/taco-go-web-framework/example/configs"
-	"github.com/yagobatista/taco-go-web-framework/example/structs"
+	"github.com/yagobatista/taco-go-web-framework/example/models"
 	"github.com/yagobatista/taco-go-web-framework/src/configs"
 	"github.com/yagobatista/taco-go-web-framework/src/database"
 )
@@ -25,8 +25,8 @@ func (this BookHandler) BuyBook(ctx context.Context, urlParams BuyBookUrlParams,
 		return struct{}{}, errors.New("feature disabled")
 	}
 
-	var instance structs.Book
-	var filter structs.Book
+	var instance models.Book
+	var filter models.Book
 	filter.ID = urlParams.ID
 
 	err := database.GetConnectionFromCtx(ctx).Where(filter).Find(&instance).Error
